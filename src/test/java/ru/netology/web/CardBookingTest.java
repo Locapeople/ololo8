@@ -21,10 +21,8 @@ public class CardBookingTest {
     void testCorrectInputs() {
         open("http://localhost:9999");
         $("[data-test-id=city] input").setValue("Уфа");
-        // получить дату указанную в поле (сегодня)
-        String currentDateString = $("[data-test-id=date] input").getValue();
-        // получить новую дату (прибавить 5 дней)
-        String newDateString = dateAdjustDaysStringFormatted(currentDateString, "dd.MM.uuuu", 5);
+        // получить новую дату (прибавить 5 дней к сегодняшней)
+        String newDateString = dateTodayAdjustDaysStringFormatted("dd.MM.uuuu", 5);
         // очистить пред. значение
         $("[data-test-id='date'] input").sendKeys(Keys.chord(Keys.SHIFT, Keys.HOME), Keys.BACK_SPACE);
         // записать в поле новую дату
@@ -39,10 +37,10 @@ public class CardBookingTest {
                 .shouldHave(exactText("Успешно!\nВстреча успешно забронирована на " + newDateString));
     }
 
-    String dateAdjustDaysStringFormatted(String date, String format, long days) {
+    String dateTodayAdjustDaysStringFormatted(String format, long days) {
+        LocalDate today = LocalDate.now();
         DateTimeFormatter f = DateTimeFormatter.ofPattern(format);
-        LocalDate currentDate = LocalDate.parse(requireNonNull(date), f);
-        LocalDate newDate = currentDate.plusDays(days);
+        LocalDate newDate = today.plusDays(days);
         return f.format(newDate);
     }
 }
